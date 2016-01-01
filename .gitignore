@@ -1,6 +1,7 @@
 /lib/
 /tests/
 /index.js
+npm-debug.log
 
 node_modules
 tests/bundle.js
