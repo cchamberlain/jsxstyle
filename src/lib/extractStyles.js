@@ -1,11 +1,8 @@
-'use strict';
-
 var CSSDisplayNames = require('./CSSDisplayNames');
 var CSSPropertyOperations = require('react/lib/CSSPropertyOperations');
 
-var assign = require('object-assign');
+var vm = require('vm')
 var autoprefix = require('./autoprefix');
-var contextify = require('contextify');
 var invariant = require('invariant');
 var recast = require('recast');
 var types = recast.types;
@@ -38,7 +35,7 @@ function getDefaultGetClassNameAndComment() {
 }
 
 function extractStyles(src, staticNamespace, getClassNameAndComment) {
-  invariant(typeof src === 'string', 'You must pass a string src');
+  invariant(typeof src === 'string', 'You must pass a string src')
 
   getClassNameAndComment = getClassNameAndComment || getDefaultGetClassNameAndComment();
   staticNamespace = staticNamespace || {};
@@ -46,10 +43,13 @@ function extractStyles(src, staticNamespace, getClassNameAndComment) {
   invariant(typeof getClassNameAndComment === 'function', 'getClassNameAndComment must be a function');
   invariant(typeof staticNamespace === 'object', 'staticNamespace must be an object');
 
-  var evalContext = assign({}, staticNamespace);
-  contextify(evalContext);
+  var evalContext = vm.createContext(Object.assign({}, staticNamespace))
+  //contextify(evalContext);
   function evaluate(exprNode) {
-    return evalContext.run(recast.print(exprNode).code);
+    let output = vm.runInContext(recase.print(exprNode).code, evalContext, { displayErrors: true })
+    console.dir(output)
+    return output
+    //return evalContext.run(recast.print(exprNode).code)
   }
 
   var ast = recast.parse(src);
@@ -80,10 +80,7 @@ function extractStyles(src, staticNamespace, getClassNameAndComment) {
 
       var newAttributes = [];
 
-      staticStyles.push({
-        node: node,
-        staticAttributes: staticAttributes,
-      });
+      staticStyles.push({ node, staticAttributes })
 
       if (hasDynamicAttributes) {
         var properties = [];
@@ -116,14 +113,14 @@ function extractStyles(src, staticNamespace, getClassNameAndComment) {
 
 
   recast.visit(ast, {
-    visitJSXElement: function(path) {
+    visitJSXElement: path => {
       var elementName = transformOpeningElement(path.node.openingElement);
       if (path.node.closingElement) {
         path.node.closingElement.name.name = elementName;
       }
       this.traverse(path);
-    },
-  });
+    }
+  })
 
   var css = '';
 
@@ -154,12 +151,9 @@ function extractStyles(src, staticNamespace, getClassNameAndComment) {
     );
   });
 
-  evalContext.dispose();
+  //evalContext.dispose();
 
-  return {
-    js: recast.print(ast).code,
-    css: css,
-  };
+  return { js: recast.print(ast).code, css }
 }
 
 module.exports = extractStyles;

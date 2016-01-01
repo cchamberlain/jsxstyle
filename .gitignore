@@ -1,3 +1,7 @@
+/lib/
+/tests/
+/index.js
+
 node_modules
 tests/bundle.js
 example/bundle.js
