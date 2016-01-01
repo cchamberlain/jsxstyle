@@ -13,8 +13,8 @@
     "rebuild": "npm run clean && npm run build",
     "test": "npm run rebuild && jasmine-node tests/",
     "lint": "jsxhint lib/",
-    "prepublish": "in-publish && npm prune --production && npm shrinkwrap || not-in-publish",
-    "postpublish": "rimraf npm-shrinkwrap.json",
+    "_prepublish": "in-publish && npm prune --production && npm shrinkwrap || not-in-publish",
+    "_postpublish": "rimraf npm-shrinkwrap.json",
     "package": "npm run rebuild && npm version patch && npm publish --tag latest"
   },
   "author": "floydophone",
